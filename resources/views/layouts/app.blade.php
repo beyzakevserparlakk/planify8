@@ -3,22 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
-    <title><?php echo e(config('app.name', 'Planify')); ?></title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>{{ config('app.name', 'Planify') }}</title>
 
-    
-    <?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css', 'resources/js/app.js']); ?>
+    {{-- Vite Assets --}}
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-    
+    {{-- Swiper CSS --}}
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 
-    
+    {{-- Alpine.js --}}
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 <body class="bg-white text-gray-900 antialiased">
 
-    
-    
+    {{-- Navbar --}}
+    {{-- Skip to main content: klavye ve ekran okuyucu kullanıcıları için --}}
     <a href="#main-content"
        class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[100] focus:px-4 focus:py-2 focus:bg-[#ff5528] focus:text-white focus:rounded-lg focus:font-bold focus:text-sm">
         Ana içeriğe geç
@@ -28,60 +28,60 @@
         <div class="max-w-7xl mx-auto px-6">
             <div class="flex items-center justify-between h-16">
 
-                
-                <a href="<?php echo e(route('home')); ?>"
+                {{-- Logo --}}
+                <a href="{{ route('home') }}"
                    aria-label="Planify — Ana sayfaya git"
                    class="text-2xl font-black tracking-tight text-[#1a1a1a]">
                     Plan<span class="text-[#ff5528]" aria-hidden="true">ify</span>
                 </a>
 
-                
+                {{-- Masaüstü Menü --}}
                 <ul role="list" class="hidden md:flex items-center gap-8 list-none m-0 p-0">
                     <li>
-                        <a href="<?php echo e(route('home')); ?>"
-                           aria-current="<?php echo e(request()->routeIs('home') ? 'page' : 'false'); ?>"
+                        <a href="{{ route('home') }}"
+                           aria-current="{{ request()->routeIs('home') ? 'page' : 'false' }}"
                            class="text-sm font-bold uppercase tracking-widest transition-colors
-                                  <?php echo e(request()->routeIs('home') ? 'text-[#ff5528]' : 'text-gray-600 hover:text-[#ff5528]'); ?>">
+                                  {{ request()->routeIs('home') ? 'text-[#ff5528]' : 'text-gray-600 hover:text-[#ff5528]' }}">
                             Ana Sayfa
                         </a>
                     </li>
                     <li>
-                        <a href="<?php echo e(route('etkinlikler.index')); ?>"
-                           aria-current="<?php echo e(request()->routeIs('etkinlikler.*') ? 'page' : 'false'); ?>"
+                        <a href="{{ route('etkinlikler.index') }}"
+                           aria-current="{{ request()->routeIs('etkinlikler.*') ? 'page' : 'false' }}"
                            class="text-sm font-bold uppercase tracking-widest transition-colors
-                                  <?php echo e(request()->routeIs('etkinlikler.*') ? 'text-[#ff5528]' : 'text-gray-600 hover:text-[#ff5528]'); ?>">
+                                  {{ request()->routeIs('etkinlikler.*') ? 'text-[#ff5528]' : 'text-gray-600 hover:text-[#ff5528]' }}">
                             Etkinlikler
                         </a>
                     </li>
                 </ul>
 
-                
+                {{-- Auth Alanı --}}
                 <div class="flex items-center gap-4">
-                    <?php if(auth()->guard()->check()): ?>
-                        <a href="<?php echo e(route('etkinlikler.create')); ?>"
+                    @auth
+                        <a href="{{ route('etkinlikler.create') }}"
                            class="px-5 py-2 bg-[#ff5528] text-white text-xs font-black uppercase tracking-widest rounded-lg hover:bg-black transition-colors focus:outline-none focus:ring-2 focus:ring-[#ff5528] focus:ring-offset-2">
                             <span aria-hidden="true">+</span> Plan Ekle
                         </a>
-                        <form method="POST" action="<?php echo e(route('logout')); ?>">
-                            <?php echo csrf_field(); ?>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
                             <button type="submit"
                                     aria-label="Hesaptan çıkış yap"
                                     class="text-sm font-bold text-gray-500 hover:text-[#ff5528] transition-colors focus:outline-none focus:ring-2 focus:ring-[#ff5528] focus:ring-offset-2 rounded">
                                 Çıkış
                             </button>
                         </form>
-                    <?php else: ?>
-                        <a href="<?php echo e(route('login')); ?>"
+                    @else
+                        <a href="{{ route('login') }}"
                            class="text-sm font-bold text-gray-600 hover:text-[#ff5528] transition-colors focus:outline-none focus:ring-2 focus:ring-[#ff5528] focus:ring-offset-2 rounded px-2 py-1">
                             Giriş
                         </a>
-                        <a href="<?php echo e(route('register')); ?>"
+                        <a href="{{ route('register') }}"
                            class="px-5 py-2 bg-[#ff5528] text-white text-xs font-black uppercase tracking-widest rounded-lg hover:bg-black transition-colors focus:outline-none focus:ring-2 focus:ring-[#ff5528] focus:ring-offset-2">
                             Kayıt Ol
                         </a>
-                    <?php endif; ?>
+                    @endauth
 
-                    
+                    {{-- Mobil Menü Butonu --}}
                     <button type="button"
                             id="mobile-menu-btn"
                             aria-controls="mobile-menu"
@@ -98,79 +98,77 @@
             </div>
         </div>
 
-        
+        {{-- Mobil Menü --}}
         <div id="mobile-menu"
              role="region"
              aria-label="Mobil gezinme menüsü"
              class="hidden md:hidden border-t border-gray-100 bg-white">
             <ul role="list" class="list-none m-0 p-0 px-6 py-4 space-y-1">
                 <li>
-                    <a href="<?php echo e(route('home')); ?>"
-                       aria-current="<?php echo e(request()->routeIs('home') ? 'page' : 'false'); ?>"
+                    <a href="{{ route('home') }}"
+                       aria-current="{{ request()->routeIs('home') ? 'page' : 'false' }}"
                        class="block px-4 py-3 rounded-lg text-sm font-bold uppercase tracking-widest transition-colors
-                              <?php echo e(request()->routeIs('home') ? 'bg-[#ff5528]/10 text-[#ff5528]' : 'text-gray-600 hover:bg-gray-50 hover:text-[#ff5528]'); ?>">
+                              {{ request()->routeIs('home') ? 'bg-[#ff5528]/10 text-[#ff5528]' : 'text-gray-600 hover:bg-gray-50 hover:text-[#ff5528]' }}">
                         Ana Sayfa
                     </a>
                 </li>
                 <li>
-                    <a href="<?php echo e(route('etkinlikler.index')); ?>"
-                       aria-current="<?php echo e(request()->routeIs('etkinlikler.*') ? 'page' : 'false'); ?>"
+                    <a href="{{ route('etkinlikler.index') }}"
+                       aria-current="{{ request()->routeIs('etkinlikler.*') ? 'page' : 'false' }}"
                        class="block px-4 py-3 rounded-lg text-sm font-bold uppercase tracking-widest transition-colors
-                              <?php echo e(request()->routeIs('etkinlikler.*') ? 'bg-[#ff5528]/10 text-[#ff5528]' : 'text-gray-600 hover:bg-gray-50 hover:text-[#ff5528]'); ?>">
+                              {{ request()->routeIs('etkinlikler.*') ? 'bg-[#ff5528]/10 text-[#ff5528]' : 'text-gray-600 hover:bg-gray-50 hover:text-[#ff5528]' }}">
                         Etkinlikler
                     </a>
                 </li>
-                <?php if(auth()->guard()->check()): ?>
+                @auth
                     <li>
-                        <a href="<?php echo e(route('etkinlikler.create')); ?>"
+                        <a href="{{ route('etkinlikler.create') }}"
                            class="block px-4 py-3 rounded-lg text-sm font-bold uppercase tracking-widest text-gray-600 hover:bg-gray-50 hover:text-[#ff5528] transition-colors">
                             Plan Ekle
                         </a>
                     </li>
-                <?php endif; ?>
+                @endauth
             </ul>
         </div>
     </nav>
 
-    
+    {{-- Navbar boşluğu --}}
     <div class="h-16"></div>
 
-    
-    <?php if(session('success')): ?>
+    {{-- Flash mesajlar --}}
+    @if(session('success'))
         <div role="alert" aria-live="polite" class="max-w-7xl mx-auto px-6 mt-4">
             <div class="bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-lg text-sm font-bold">
-                <?php echo e(session('success')); ?>
-
+                {{ session('success') }}
             </div>
         </div>
-    <?php endif; ?>
+    @endif
 
-    <?php if(session('error')): ?>
+    @if(session('error'))
         <div role="alert" aria-live="assertive" class="max-w-7xl mx-auto px-6 mt-4">
             <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm font-bold">
-                <?php echo e(session('error')); ?>
-
+                {{ session('error') }}
             </div>
         </div>
-    <?php endif; ?>
+    @endif
 
-    
+    {{-- İçerik --}}
     <main id="main-content" tabindex="-1">
-        <?php echo $__env->yieldContent('content'); ?>
+        @yield('content')
     </main>
 
-    
+    {{-- Footer --}}
     <footer class="bg-[#1a1a1a] text-white py-12 mt-auto">
         <div class="max-w-7xl mx-auto px-6 text-center">
             <p class="text-2xl font-black mb-2">Plan<span class="text-[#ff5528]">ify</span></p>
-            <p class="text-gray-500 text-sm">© <?php echo e(date('Y')); ?> Planify. Tüm hakları saklıdır.</p>
+            <p class="text-gray-500 text-sm">© {{ date('Y') }} Planify. Tüm hakları saklıdır.</p>
         </div>
     </footer>
 
-    
+    {{-- Swiper JS --}}
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
-    
+    {{-- Mobil Menü Toggle --}}
     <script>
         (function () {
             const btn  = document.getElementById('mobile-menu-btn');
@@ -206,4 +204,3 @@
 
 </body>
 </html>
-<?php /**PATH C:\laragon\www\planify\resources\views/layouts/app.blade.php ENDPATH**/ ?>

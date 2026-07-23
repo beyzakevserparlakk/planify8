@@ -54,7 +54,7 @@
     
   
    
-    <section class="relative mt-16 pt-12 border-gray-200" style="background-color: #FCFCFC">
+    <section class="sticky top-0 z-50 mt-56 pt-12 border-gray-200" style="background-color: #FCFCFC">
     <div class="max-w-7xl mx-auto px-6">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             
@@ -79,7 +79,7 @@
                     <span class="text-3xl flex-shrink-0">🙋</span>
                     <div class="flex flex-col items-center justify-center text-center">
                         <h4 class="text-lg font-black text-gray-900 leading-tight uppercase tracking-tighter">Sosyal Rehber</h4>
-                        <p class="text-[11px] font-bold  text-[#ff5528] text-emerald-600 uppercase tracking-widest mt-1 opacity-70">Size Özel Planlar</p>
+                        <p class="text-[11px] font-bold text-emerald-600 uppercase tracking-widest mt-1 opacity-70">Size Özel Planlar</p>
                     </div>
                 </div>
                 <div class="absolute bottom-0 left-0 h-1.5 bg-emerald-500 w-0 group-hover:w-full transition-all duration-500"></div>
@@ -93,7 +93,7 @@
                     <span class="text-3xl flex-shrink-0">🏛️</span>
                     <div class="flex flex-col items-center justify-center text-center">
                         <h4 class="text-lg font-black text-gray-900 leading-tight uppercase tracking-tighter">Şehir Etkinlikleri</h4>
-                        <p class="text-[11px] font-bold  text-[#ff5528]  uppercase tracking-widest mt-1 opacity-70">Resmi Duyurular</p>
+                        <p class="text-[11px] font-bold text-indigo-600 uppercase tracking-widest mt-1 opacity-70">Resmi Duyurular</p>
                     </div>
                 </div>
                 <div class="absolute bottom-0 left-0 h-1.5 bg-indigo-600 w-0 group-hover:w-full transition-all duration-500"></div>
@@ -102,20 +102,22 @@
         </div>
     </div>
 </section>
-<div class="h-12" style="background:#FCFCFC "></div> 
     
-    <section class="py-20 bg-white  border-gray-100 mt-5 MB">
-        <div class="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-12 text-center ğt">
+    <div class="h-32 bg-[#FCFCFC]"></div>
+
+    
+    <section class="py-20 bg-white border-b border-gray-100">
+        <div class="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-12 text-center">
             <div class="space-y-2">
-                <span class="block text-5xl font-black text-[#1a1a1a]"><?php echo e($stats['cityCount']); ?>+</span>
+                <span class="block text-5xl font-black text-[#1a1a1a]">500+</span>
                 <span class="text-[#ff5528] font-bold uppercase tracking-widest text-[10px]">Şehir Güncellemesi</span>
             </div>
             <div class="space-y-2">
-                <span class="block text-5xl font-black text-[#1a1a1a]"><?php echo e($stats['eventCount']); ?>+</span>
+                <span class="block text-5xl font-black text-[#1a1a1a]">1200+</span>
                 <span class="text-[#ff5528] font-bold uppercase tracking-widest text-[10px]">Başarılı Plan</span>
             </div>
             <div class="space-y-2">
-                <span class="block text-5xl font-black text-[#1a1a1a]"><?php echo e($stats['userCount']); ?>+</span>
+                <span class="block text-5xl font-black text-[#1a1a1a]">5k+</span>
                 <span class="text-[#ff5528] font-bold uppercase tracking-widest text-[10px]">Mutlu Kullanıcı</span>
             </div>
             <div class="space-y-2">

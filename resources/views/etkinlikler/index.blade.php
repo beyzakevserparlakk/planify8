@@ -97,7 +97,7 @@
     <div class="max-w-7xl mx-auto px-6">
         <div class="mb-16 flex justify-between items-end">
             <div>
-                <span class="text-[#ff5528] font-bold tracking-[0.3em] uppercase text-xs mb-3 block italic" style="margin-top: 55px;">Mekanlar</span>
+                <span class="text-[#ff5528] font-bold tracking-[0.3em] uppercase text-xs mb-3 block italic" style="margin-top: 15px;">Mekanlar</span>
                 <h2 class="text-4xl md:text-6xl font-black text-[#1a1a1a]"></h2>
             </div>
         </div>
