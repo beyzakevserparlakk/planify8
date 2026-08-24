@@ -8,18 +8,22 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('cities', function (Blueprint $table) {
-            $table->id();
-            $table->string('name')->unique();
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('cities')) {
+            Schema::create('cities', function (Blueprint $table) {
+                $table->id();
+                $table->string('name')->unique();
+                $table->timestamps();
+            });
+        }
 
-        Schema::create('districts', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('city_id')->constrained()->cascadeOnDelete();
-            $table->string('name');
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('districts')) {
+            Schema::create('districts', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('city_id')->constrained()->cascadeOnDelete();
+                $table->string('name');
+                $table->timestamps();
+            });
+        }
     }
 
     public function down(): void

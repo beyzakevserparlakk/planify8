@@ -8,15 +8,17 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('sliders', function (Blueprint $table) {
-            $table->id();
-            $table->string('title');
-            $table->string('image');
-            $table->string('link')->nullable();
-            $table->boolean('is_active')->default(true);
-            $table->integer('order')->default(0);
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('sliders')) {
+            Schema::create('sliders', function (Blueprint $table) {
+                $table->id();
+                $table->string('title');
+                $table->string('image');
+                $table->string('link')->nullable();
+                $table->boolean('is_active')->default(true);
+                $table->integer('order')->default(0);
+                $table->timestamps();
+            });
+        }
     }
 
     public function down(): void

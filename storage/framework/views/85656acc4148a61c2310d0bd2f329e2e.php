@@ -1,305 +1,197 @@
 <?php $__env->startSection('title', 'Etkinlik Yönetimi'); ?>
+<?php $__env->startSection('page_title', 'Tüm Etkinlikler'); ?>
 
 <?php $__env->startSection('content'); ?>
+<div class="space-y-6">
 
-
-<div class="flex items-center gap-2 mb-6">
-    <button onclick="switchTab('pending')" id="tab-pending"
-        class="tab-btn active-tab px-6 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all flex items-center gap-2">
-        <span class="w-5 h-5 rounded-full bg-orange-100 text-orange-500 flex items-center justify-center text-[9px] font-black">
-            <?php echo e($pending->count()); ?>
-
-        </span>
-        Bekleyenler
-    </button>
-    <button onclick="switchTab('approved')" id="tab-approved"
-        class="tab-btn px-6 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all flex items-center gap-2">
-        <span class="w-5 h-5 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-[9px] font-black">
-            <?php echo e($approved->count()); ?>
-
-        </span>
-        Onaylananlar
-    </button>
-    <button onclick="switchTab('rejected')" id="tab-rejected"
-        class="tab-btn px-6 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all flex items-center gap-2">
-        <span class="w-5 h-5 rounded-full bg-red-100 text-red-500 flex items-center justify-center text-[9px] font-black">
-            <?php echo e($rejected->count()); ?>
-
-        </span>
-        Reddedilenler
-    </button>
-</div>
-
-
-<div id="panel-pending" class="tab-panel">
-    <div class="bg-white rounded-[40px] border border-gray-100 shadow-sm overflow-hidden">
-        <div class="p-8 border-b border-gray-50 bg-gray-50/50 flex items-center justify-between">
-            <div>
-                <h3 class="text-lg font-black font-heading uppercase tracking-tight text-[#0f172a]">Onay Bekleyen Etkinlikler</h3>
-                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Aşağıdaki etkinlikleri inceleyip onaylayın veya reddedin.</p>
-            </div>
+    
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        
+        
+        <div class="flex flex-wrap items-center gap-2">
+            <a href="<?php echo e(route('admin.events.index')); ?>"
+               class="px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition <?php echo e(!request('status') ? 'bg-[#ff5528] text-white shadow-lg shadow-[#ff5528]/25' : 'bg-[#16181e] text-gray-400 hover:text-white border border-gray-800'); ?>">
+                Tümü (<?php echo e($counts['all']); ?>)
+            </a>
+            <a href="<?php echo e(route('admin.events.index', ['status' => 'pending'])); ?>"
+               class="px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition <?php echo e(request('status') === 'pending' ? 'bg-amber-500 text-white shadow-lg shadow-amber-500/25' : 'bg-[#16181e] text-amber-400 hover:bg-amber-500/10 border border-gray-800'); ?>">
+                Bekleyenler (<?php echo e($counts['pending']); ?>)
+            </a>
+            <a href="<?php echo e(route('admin.events.index', ['status' => 'approved'])); ?>"
+               class="px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition <?php echo e(request('status') === 'approved' ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/25' : 'bg-[#16181e] text-emerald-400 hover:bg-emerald-500/10 border border-gray-800'); ?>">
+                Onaylılar (<?php echo e($counts['approved']); ?>)
+            </a>
+            <a href="<?php echo e(route('admin.events.index', ['status' => 'rejected'])); ?>"
+               class="px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition <?php echo e(request('status') === 'rejected' ? 'bg-red-600 text-white shadow-lg shadow-red-600/25' : 'bg-[#16181e] text-red-400 hover:bg-red-500/10 border border-gray-800'); ?>">
+                Reddedilenler (<?php echo e($counts['rejected']); ?>)
+            </a>
         </div>
-        <div class="overflow-x-auto p-8">
-            <table id="pendingTable" class="w-full text-left border-collapse">
-                <thead>
-                    <tr>
-                        <th class="px-4 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Etkinlik</th>
-                        <th class="px-4 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Ekleyen</th>
-                        <th class="px-4 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Tarih</th>
-                        <th class="px-4 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 text-right">İşlemler</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php $__empty_1 = true; $__currentLoopData = $pending; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $etkinlik): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-                    <tr class="border-t border-gray-50 hover:bg-gray-50/50 transition-colors">
-                        <td class="px-4 py-4">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
-                                    <?php if($etkinlik->image): ?>
-                                        <img src="<?php echo e(asset('storage/' . $etkinlik->image)); ?>" class="w-full h-full object-cover">
-                                    <?php else: ?>
-                                        <div class="w-full h-full flex items-center justify-center text-gray-300"><i class="fa-solid fa-image text-sm"></i></div>
-                                    <?php endif; ?>
-                                </div>
-                                <div>
-                                    <p class="text-sm font-black text-[#0f172a]"><?php echo e($etkinlik->title); ?></p>
-                                    <p class="text-[10px] text-gray-400 font-bold uppercase"><?php echo e(Str::limit($etkinlik->location, 25)); ?></p>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-4 py-4">
-                            <div class="flex items-center gap-2">
-                                <div class="w-7 h-7 rounded-lg bg-primary/10 text-primary flex items-center justify-center font-black text-[9px]"><?php echo e(substr($etkinlik->user->name, 0, 2)); ?></div>
-                                <span class="text-xs font-bold text-gray-600"><?php echo e($etkinlik->user->name); ?></span>
-                            </div>
-                        </td>
-                        <td class="px-4 py-4">
-                            <span class="text-xs font-bold text-gray-500"><?php echo e($etkinlik->date ? $etkinlik->date->format('d.m.Y') : '-'); ?></span>
-                        </td>
-                        <td class="px-4 py-4 text-right">
-                            <div class="flex items-center justify-end gap-2">
-                                <form action="<?php echo e(route('admin.events.approve', $etkinlik)); ?>" method="POST">
-                                    <?php echo csrf_field(); ?>
-                                    <button type="submit" class="icon-btn b-r-4 btn-light-success" title="Onayla"><i class="fa-solid fa-check"></i></button>
-                                </form>
-                                <form action="<?php echo e(route('admin.events.reject', $etkinlik)); ?>" method="POST">
-                                    <?php echo csrf_field(); ?>
-                                    <button type="submit" class="icon-btn b-r-4 btn-light-secondary" title="Reddet"><i class="fa-solid fa-xmark"></i></button>
-                                </form>
-                                <form action="<?php echo e(route('admin.events.destroy', $etkinlik)); ?>" method="POST" onsubmit="return confirm('Bu etkinliği silmek istediğinize emin misiniz?')">
-                                    <?php echo csrf_field(); ?> <?php echo method_field('DELETE'); ?>
-                                    <button type="submit" class="icon-btn b-r-4 btn-light-danger" title="Sil"><i class="fa-solid fa-trash-can"></i></button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
-                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-                    <tr><td colspan="4" class="px-4 py-16 text-center text-gray-400 text-sm font-bold uppercase tracking-widest">Onay bekleyen etkinlik yok 🎉</td></tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
-        </div>
+
+        <a href="<?php echo e(route('admin.events.create')); ?>"
+           class="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-[#ff5528] hover:bg-white hover:text-black text-white text-xs font-black uppercase tracking-wider rounded-xl transition shadow-lg shadow-[#ff5528]/20">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
+            </svg>
+            Yeni Etkinlik Ekle
+        </a>
     </div>
-</div>
 
-
-<div id="panel-approved" class="tab-panel hidden">
-    <div class="bg-white rounded-[40px] border border-gray-100 shadow-sm overflow-hidden">
-        <div class="p-8 border-b border-gray-50 bg-green-50/50 flex items-center gap-4">
-            <div class="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
-                <i class="fa-solid fa-circle-check text-green-500"></i>
+    
+    <div class="bg-[#16181e] p-4 rounded-2xl border border-gray-800">
+        <form method="GET" action="<?php echo e(route('admin.events.index')); ?>" class="flex flex-col sm:flex-row gap-3">
+            <?php if(request('status')): ?>
+                <input type="hidden" name="status" value="<?php echo e(request('status')); ?>">
+            <?php endif; ?>
+            <div class="flex-1 relative">
+                <svg class="w-4 h-4 text-gray-500 absolute left-4 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+                <input type="text" name="search" value="<?php echo e(request('search')); ?>" placeholder="Başlık, mekan veya şehir ara..."
+                       class="w-full bg-white/5 border border-gray-700/60 rounded-xl py-2.5 pl-11 pr-4 text-xs font-bold text-white placeholder-gray-500 focus:outline-none focus:border-[#ff5528]">
             </div>
-            <div>
-                <h3 class="text-lg font-black font-heading uppercase tracking-tight text-[#0f172a]">Onaylanan Etkinlikler</h3>
-                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Bu etkinlikler sitede yayında.</p>
-            </div>
-        </div>
-        <div class="overflow-x-auto p-8">
-            <table id="approvedTable" class="w-full text-left border-collapse">
-                <thead>
-                    <tr>
-                        <th class="px-4 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Etkinlik</th>
-                        <th class="px-4 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Ekleyen</th>
-                        <th class="px-4 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Tarih</th>
-                        <th class="px-4 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 text-right">İşlemler</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php $__empty_1 = true; $__currentLoopData = $approved; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $etkinlik): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-                    <tr class="border-t border-gray-50 hover:bg-gray-50/50 transition-colors">
-                        <td class="px-4 py-4">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
-                                    <?php if($etkinlik->image): ?>
-                                        <img src="<?php echo e(asset('storage/' . $etkinlik->image)); ?>" class="w-full h-full object-cover">
-                                    <?php else: ?>
-                                        <div class="w-full h-full flex items-center justify-center text-gray-300"><i class="fa-solid fa-image text-sm"></i></div>
-                                    <?php endif; ?>
-                                </div>
-                                <div>
-                                    <p class="text-sm font-black text-[#0f172a]"><?php echo e($etkinlik->title); ?></p>
-                                    <p class="text-[10px] text-gray-400 font-bold uppercase"><?php echo e(Str::limit($etkinlik->location, 25)); ?></p>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-4 py-4">
-                            <div class="flex items-center gap-2">
-                                <div class="w-7 h-7 rounded-lg bg-primary/10 text-primary flex items-center justify-center font-black text-[9px]"><?php echo e(substr($etkinlik->user->name, 0, 2)); ?></div>
-                                <span class="text-xs font-bold text-gray-600"><?php echo e($etkinlik->user->name); ?></span>
-                            </div>
-                        </td>
-                        <td class="px-4 py-4">
-                            <span class="text-xs font-bold text-gray-500"><?php echo e($etkinlik->date ? $etkinlik->date->format('d.m.Y') : '-'); ?></span>
-                        </td>
-                        <td class="px-4 py-4 text-right">
-                            <div class="flex items-center justify-end gap-2">
-                                <form action="<?php echo e(route('admin.events.reject', $etkinlik)); ?>" method="POST">
-                                    <?php echo csrf_field(); ?>
-                                    <button type="submit" class="icon-btn b-r-4 btn-light-secondary" title="Geri Al"><i class="fa-solid fa-rotate-left"></i></button>
-                                </form>
-                                <form action="<?php echo e(route('admin.events.destroy', $etkinlik)); ?>" method="POST" onsubmit="return confirm('Bu etkinliği silmek istediğinize emin misiniz?')">
-                                    <?php echo csrf_field(); ?> <?php echo method_field('DELETE'); ?>
-                                    <button type="submit" class="icon-btn b-r-4 btn-light-danger" title="Sil"><i class="fa-solid fa-trash-can"></i></button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
-                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-                    <tr><td colspan="4" class="px-4 py-16 text-center text-gray-400 text-sm font-bold uppercase tracking-widest">Henüz onaylanan etkinlik yok.</td></tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
-        </div>
+            <button type="submit" class="px-6 py-2.5 bg-white/10 hover:bg-white/20 text-white text-xs font-black uppercase rounded-xl transition">
+                Filtrele
+            </button>
+            <?php if(request()->hasAny(['search', 'status'])): ?>
+                <a href="<?php echo e(route('admin.events.index')); ?>" class="px-4 py-2.5 text-xs text-gray-400 hover:text-white flex items-center justify-center">
+                    Sıfırla
+                </a>
+            <?php endif; ?>
+        </form>
     </div>
-</div>
 
+    
+    <div class="bg-[#16181e] rounded-3xl border border-gray-800/80 shadow-xl overflow-hidden">
+        <?php if($events->count() > 0): ?>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs">
+                    <thead>
+                        <tr class="bg-white/5 text-gray-400 font-black uppercase tracking-wider text-[10px] border-b border-gray-800">
+                            <th class="py-4 px-4">Etkinlik Bilgisi</th>
+                            <th class="py-4 px-4">Kategori & Ücret</th>
+                            <th class="py-4 px-4">Tarih & Mekan</th>
+                            <th class="py-4 px-4">Kaynak & Durum</th>
+                            <th class="py-4 px-4 text-right">İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-800 font-medium">
+                        <?php $__currentLoopData = $events; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $event): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <tr class="hover:bg-white/[0.03] transition">
+                                
+                                <td class="py-4 px-4">
+                                    <div class="flex items-center gap-3">
+                                        <img src="<?php echo e($event->image ? asset('storage/' . $event->image) : 'https://images.unsplash.com/photo-1514525253361-bee1863265c7?w=100'); ?>"
+                                             alt="<?php echo e($event->title); ?>"
+                                             class="w-12 h-12 rounded-2xl object-cover flex-shrink-0 bg-gray-800">
+                                        <div>
+                                            <a href="<?php echo e(route('etkinlikler.show', $event->slug)); ?>" target="_blank" class="font-bold text-white hover:text-[#ff5528] line-clamp-1">
+                                                <?php echo e($event->title); ?>
 
-<div id="panel-rejected" class="tab-panel hidden">
-    <div class="bg-white rounded-[40px] border border-gray-100 shadow-sm overflow-hidden">
-        <div class="p-8 border-b border-gray-50 bg-red-50/50 flex items-center gap-4">
-            <div class="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center">
-                <i class="fa-solid fa-circle-xmark text-red-500"></i>
+                                            </a>
+                                            <div class="text-[10px] text-gray-500 mt-0.5">Slug: <?php echo e($event->slug); ?></div>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                
+                                <td class="py-4 px-4">
+                                    <div class="font-bold text-gray-300"><?php echo e($event->category ?: '-'); ?></div>
+                                    <div class="text-emerald-400 text-[11px] font-bold"><?php echo e($event->cost ?: 'Ücretsiz'); ?></div>
+                                </td>
+
+                                
+                                <td class="py-4 px-4">
+                                    <div class="text-gray-300 font-bold"><?php echo e($event->date ? $event->date->translatedFormat('d M Y, H:i') : 'Tarih Yok'); ?></div>
+                                    <div class="text-gray-500 text-[11px]"><?php echo e($event->district ? $event->district . ', ' : ''); ?><?php echo e($event->city ?: '-'); ?></div>
+                                </td>
+
+                                
+                                <td class="py-4 px-4">
+                                    <div class="space-y-1">
+                                        <div>
+                                            <?php if($event->source_type === 'official'): ?>
+                                                <span class="px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-400 text-[9px] font-black uppercase">Şehir</span>
+                                            <?php else: ?>
+                                                <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-[9px] font-black uppercase">Sosyal</span>
+                                            <?php endif; ?>
+                                        </div>
+                                        <div>
+                                            <?php if($event->status === 'approved'): ?>
+                                                <span class="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[9px] font-black uppercase">Onaylı</span>
+                                            <?php elseif($event->status === 'pending'): ?>
+                                                <span class="px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 text-[9px] font-black uppercase">Bekliyor</span>
+                                            <?php else: ?>
+                                                <span class="px-2 py-0.5 rounded-full bg-red-500/10 text-red-400 border border-red-500/20 text-[9px] font-black uppercase">Red</span>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                
+                                <td class="py-4 px-4 text-right">
+                                    <div class="inline-flex items-center gap-1.5">
+                                        
+                                        <?php if($event->status !== 'approved'): ?>
+                                            <form action="<?php echo e(route('admin.events.status', $event->id)); ?>" method="POST" class="inline">
+                                                <?php echo csrf_field(); ?>
+                                                <?php echo method_field('PATCH'); ?>
+                                                <input type="hidden" name="status" value="approved">
+                                                <button type="submit" class="px-2.5 py-1 rounded-lg bg-emerald-500/20 hover:bg-emerald-500 text-emerald-400 hover:text-white transition text-[10px] font-black uppercase" title="Onayla">
+                                                    Onayla
+                                                </button>
+                                            </form>
+                                        <?php endif; ?>
+
+                                        <?php if($event->status !== 'rejected'): ?>
+                                            <form action="<?php echo e(route('admin.events.status', $event->id)); ?>" method="POST" class="inline">
+                                                <?php echo csrf_field(); ?>
+                                                <?php echo method_field('PATCH'); ?>
+                                                <input type="hidden" name="status" value="rejected">
+                                                <button type="submit" class="px-2.5 py-1 rounded-lg bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white transition text-[10px] font-black uppercase" title="Reddet">
+                                                    Reddet
+                                                </button>
+                                            </form>
+                                        <?php endif; ?>
+
+                                        
+                                        <a href="<?php echo e(route('admin.events.edit', $event->id)); ?>"
+                                           class="p-2 rounded-xl bg-white/5 hover:bg-white/15 text-gray-300 hover:text-white transition"
+                                           title="Düzenle">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                            </svg>
+                                        </a>
+
+                                        
+                                        <form action="<?php echo e(route('admin.events.destroy', $event->id)); ?>" method="POST" onsubmit="return confirm('Bu etkinliği kalıcı olarak silmek istediğinizden emin misiniz?')" class="inline">
+                                            <?php echo csrf_field(); ?>
+                                            <?php echo method_field('DELETE'); ?>
+                                            <button type="submit" class="p-2 rounded-xl bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white transition" title="Sil">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                                </svg>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                    </tbody>
+                </table>
             </div>
-            <div>
-                <h3 class="text-lg font-black font-heading uppercase tracking-tight text-[#0f172a]">Reddedilen Etkinlikler</h3>
-                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Bu etkinlikler sitede görünmüyor.</p>
+
+            <div class="p-4 border-t border-gray-800 flex justify-center">
+                <?php echo e($events->links()); ?>
+
             </div>
-        </div>
-        <div class="overflow-x-auto p-8">
-            <table id="rejectedTable" class="w-full text-left border-collapse">
-                <thead>
-                    <tr>
-                        <th class="px-4 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Etkinlik</th>
-                        <th class="px-4 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Ekleyen</th>
-                        <th class="px-4 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Tarih</th>
-                        <th class="px-4 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 text-right">İşlemler</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php $__empty_1 = true; $__currentLoopData = $rejected; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $etkinlik): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-                    <tr class="border-t border-gray-50 hover:bg-gray-50/50 transition-colors">
-                        <td class="px-4 py-4">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
-                                    <?php if($etkinlik->image): ?>
-                                        <img src="<?php echo e(asset('storage/' . $etkinlik->image)); ?>" class="w-full h-full object-cover">
-                                    <?php else: ?>
-                                        <div class="w-full h-full flex items-center justify-center text-gray-300"><i class="fa-solid fa-image text-sm"></i></div>
-                                    <?php endif; ?>
-                                </div>
-                                <div>
-                                    <p class="text-sm font-black text-[#0f172a]"><?php echo e($etkinlik->title); ?></p>
-                                    <p class="text-[10px] text-gray-400 font-bold uppercase"><?php echo e(Str::limit($etkinlik->location, 25)); ?></p>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-4 py-4">
-                            <div class="flex items-center gap-2">
-                                <div class="w-7 h-7 rounded-lg bg-primary/10 text-primary flex items-center justify-center font-black text-[9px]"><?php echo e(substr($etkinlik->user->name, 0, 2)); ?></div>
-                                <span class="text-xs font-bold text-gray-600"><?php echo e($etkinlik->user->name); ?></span>
-                            </div>
-                        </td>
-                        <td class="px-4 py-4">
-                            <span class="text-xs font-bold text-gray-500"><?php echo e($etkinlik->date ? $etkinlik->date->format('d.m.Y') : '-'); ?></span>
-                        </td>
-                        <td class="px-4 py-4 text-right">
-                            <div class="flex items-center justify-end gap-2">
-                                <form action="<?php echo e(route('admin.events.approve', $etkinlik)); ?>" method="POST">
-                                    <?php echo csrf_field(); ?>
-                                    <button type="submit" class="icon-btn b-r-4 btn-light-success" title="Onayla"><i class="fa-solid fa-check"></i></button>
-                                </form>
-                                <form action="<?php echo e(route('admin.events.destroy', $etkinlik)); ?>" method="POST" onsubmit="return confirm('Bu etkinliği silmek istediğinize emin misiniz?')">
-                                    <?php echo csrf_field(); ?> <?php echo method_field('DELETE'); ?>
-                                    <button type="submit" class="icon-btn b-r-4 btn-light-danger" title="Sil"><i class="fa-solid fa-trash-can"></i></button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
-                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-                    <tr><td colspan="4" class="px-4 py-16 text-center text-gray-400 text-sm font-bold uppercase tracking-widest">Reddedilen etkinlik yok.</td></tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
-        </div>
+        <?php else: ?>
+            <div class="text-center py-16 text-gray-500 text-xs">
+                Filtreleme kriterlerine uygun etkinlik bulunamadı.
+            </div>
+        <?php endif; ?>
     </div>
+
 </div>
-
-
 <?php $__env->stopSection(); ?>
 
-<?php $__env->startPush('scripts'); ?>
-<style>
-    .tab-btn { background: white; color: #9ca3af; border: 1px solid #f3f4f6; }
-    .tab-btn.active-tab { background: var(--primary-color); color: white; border-color: var(--primary-color); box-shadow: 0 4px 15px color-mix(in srgb, var(--primary-color), transparent 70%); }
-</style>
-<script>
-// DataTables uyarılarını popup yerine console'a yaz
-$.fn.dataTable.ext.errMode = 'none';
-
-var tables = {};
-
-const dtOpts = {
-    language: { url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/tr.json' },
-    pageLength: 25,
-    autoWidth: false,
-    order: [[2, 'desc']],
-    dom: '<"flex justify-between items-center mb-4"f>rt<"flex justify-between items-center mt-4"ip>',
-    columns: [
-        { orderable: true },
-        { orderable: true },
-        { orderable: true },
-        { orderable: false }
-    ],
-    drawCallback: function() {
-        $('.dataTables_filter input').addClass('bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-sm outline-none transition-all ml-2');
-    }
-};
-
-function switchTab(tab) {
-    document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active-tab'));
-    document.getElementById('panel-' + tab).classList.remove('hidden');
-    document.getElementById('tab-' + tab).classList.add('active-tab');
-    if (tables[tab]) tables[tab].columns.adjust().draw();
-}
-
-$(document).ready(function() {
-    ['approved', 'rejected'].forEach(function(tab) {
-        var panel = document.getElementById('panel-' + tab);
-        panel.style.cssText = 'display:block !important; position:absolute; visibility:hidden; pointer-events:none;';
-        try {
-            tables[tab] = $('#' + tab + 'Table').DataTable(dtOpts);
-        } catch(e) {
-            console.warn('DataTable init hatası (' + tab + '):', e);
-        }
-        panel.style.cssText = '';
-        panel.classList.add('hidden');
-    });
-
-    tables['pending'] = $('#pendingTable').DataTable(dtOpts);
-});
-</script>
-<?php $__env->stopPush(); ?>
-
-
-<?php echo $__env->make('layouts.admin', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\laragon\www\planify\resources\views/admin/events/index.blade.php ENDPATH**/ ?>
+<?php echo $__env->make('admin.layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\laragon\www\planify\resources\views/admin/events/index.blade.php ENDPATH**/ ?>

@@ -19,7 +19,7 @@
 
                             <div class="relative max-w-7xl mx-auto px-6 w-full z-10 flex justify-center">
                                 <div class="max-w-3xl text-white">
-                                    <h1 style="margin-top: 300px" class="text-5xl md:text-7xl font-bold mb-6 leading-tight animate-fade-up text-centerz-index: 10;">
+                                    <h1 class="hero-slide-title text-5xl md:text-7xl font-bold mb-6 leading-tight text-center z-10">
                                         {{ $slider->title }} 
                                     </h1>
 
@@ -55,10 +55,10 @@
     </section>
     
   
-   {{-- ANASAYFA FİLTRE BAR - Kart Tabanlı Modern Tasarım --}}
-    <section class="sticky top-0 z-50 mt-56 pt-12 border-gray-200" style="background-color: #FCFCFC">
-    <div class="max-w-7xl mx-auto px-6">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    {{-- ANASAYFA FİLTRE & HIZLI ERİŞİM KARTLARI --}}
+    <section class="py-16 md:py-20 relative z-20 bg-[#fcfcfc] border-b border-gray-100">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
             
             {{-- Kart 1: Tüm Planlar --}}
             <a href="{{ url('/etkinlikler') }}" 
@@ -104,9 +104,6 @@
         </div>
     </div>
 </section>
-    {{-- BOŞLUK - Filtre ile Stats arası --}}
-    <div class="h-32 bg-[#FCFCFC]"></div>
-
     {{-- 2. STATS SECTION - Temiz Beyaz Arka Plan --}}
     <section class="py-20 bg-white border-b border-gray-100">
         <div class="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-12 text-center">
@@ -184,12 +181,11 @@
                                     </div>
 
                                     <div class="mt-auto pt-4 border-t border-gray-100 flex justify-between items-center">
-                                        {{-- Linkin sonuna #detay-alani ID'si eklendi --}}
-                                        <a href="{{ url('/etkinlikler/' . $etkinlik->slug) }}#detay-alani"
-                                        class="bg-[#ff5528] text-white px-6 py-2 rounded-lg text-xs font-bold tracking-widest uppercase hover:bg-black transition-colors">
+                                        <a href="{{ route('etkinlikler.show', $etkinlik->slug) }}"
+                                           class="bg-[#ff5528] text-white px-6 py-2 rounded-lg text-xs font-bold tracking-widest uppercase hover:bg-black transition-colors">
                                             İncele
                                         </a>
-                                        <span class="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Yakında</span>
+                                        <span class="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">{{ $etkinlik->date ? $etkinlik->date->format('d M') : 'Yakında' }}</span>
                                     </div>
                                 </div>  
                             </div>
@@ -224,46 +220,134 @@
             </a>
         </div>
     </section>
-
-    {{-- Scriptler ve Swiper Başlatma --}}
+{{-- Scriptler ve Swiper Başlatma --}}
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Hero Swiper
-            new Swiper('.hero-swiper', {
-                loop: true,
-                effect: 'fade',
-                speed: 1000,
-                autoplay: { delay: 6000, disableOnInteraction: false },
-                pagination: { el: '.hero-swiper .swiper-pagination', clickable: true },
-                navigation: { nextEl: '.hero-nav-next', prevEl: '.hero-nav-prev' },
-            });
+            const heroElement = document.querySelector('.hero-swiper');
 
-            // Etkinlikler Swiper
-            new Swiper('.featured-events-swiper', {
-                slidesPerView: 1,
-                spaceBetween: 30,
-                loop: true,
-                speed: 800,
-                autoplay: { delay: 5000 },
-                pagination: { el: '.featured-events-swiper .swiper-pagination', clickable: true },
-                breakpoints: {
-                    768: { slidesPerView: 2 },
-                    1024: { slidesPerView: 3 }
+            if (heroElement) {
+                if (heroElement.swiper) {
+                    heroElement.swiper.destroy(true, true);
                 }
-            });
+
+                const heroSwiper = new Swiper(heroElement, {
+                    effect: 'slide',
+                    loop: false,
+                    rewind: true,
+                    speed: 700,
+                    slidesPerView: 1,
+                    watchOverflow: true,
+                    preventInteractionOnTransition: true,
+
+                    autoplay: {
+                        delay: 6000,
+                        disableOnInteraction: false,
+                        pauseOnMouseEnter: true
+                    },
+
+                    pagination: {
+                        el: '.hero-swiper .swiper-pagination',
+                        clickable: true
+                    },
+
+                    navigation: {
+                        nextEl: '.hero-nav-next',
+                        prevEl: '.hero-nav-prev'
+                    }
+                });
+
+                const navigationButtons = heroElement.querySelectorAll(
+                    '.hero-nav-next, .hero-nav-prev'
+                );
+
+                navigationButtons.forEach(function (button) {
+                    button.addEventListener('click', function (event) {
+                        if (heroSwiper.animating) {
+                            event.preventDefault();
+                            event.stopImmediatePropagation();
+                        }
+                    }, true);
+                });
+            }
+
+            const featuredElement = document.querySelector('.featured-events-swiper');
+
+            if (featuredElement) {
+                if (featuredElement.swiper) {
+                    featuredElement.swiper.destroy(true, true);
+                }
+
+                new Swiper(featuredElement, {
+                    slidesPerView: 1,
+                    spaceBetween: 30,
+                    loop: false,
+                    rewind: true,
+                    watchOverflow: true,
+                    speed: 800,
+                    autoplay: {
+                        delay: 5000,
+                        disableOnInteraction: false,
+                        pauseOnMouseEnter: true
+                    },
+                    pagination: {
+                        el: '.featured-events-swiper .swiper-pagination',
+                        clickable: true
+                    },
+                    breakpoints: {
+                        640: { slidesPerView: 1.5, spaceBetween: 20 },
+                        768: { slidesPerView: 2, spaceBetween: 24 },
+                        1024: { slidesPerView: 3, spaceBetween: 30 }
+                    }
+                });
+            }
         });
     </script>
 
     <style>
-        /* Aasha Tarzı Pagination */
-        .swiper-pagination-bullet { background: #d1d1d1 !important; opacity: 1 !important; }
-        .swiper-pagination-bullet-active { background: #ff5528 !important; width: 25px !important; border-radius: 4px !important; }
-        
-        /* Animasyon */
-        .animate-fade-up { animation: fadeUp 1s ease-out forwards; }
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
+        .hero-swiper .swiper-slide {
+            overflow: hidden;
+        }
+
+        .hero-swiper .hero-slide-title {
+            opacity: 0 !important;
+            visibility: hidden !important;
+            transform: translateY(18px);
+            transition:
+                opacity 0.35s ease,
+                transform 0.35s ease,
+                visibility 0s linear 0.35s;
+        }
+
+        .hero-swiper .swiper-slide-active .hero-slide-title {
+            opacity: 1 !important;
+            visibility: visible !important;
+            transform: translateY(0);
+            transition:
+                opacity 0.35s ease,
+                transform 0.35s ease,
+                visibility 0s linear 0s;
+        }
+
+        .hero-swiper .swiper-slide:not(.swiper-slide-active) .relative.z-10 {
+            opacity: 0 !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
+        }
+
+        .hero-swiper .swiper-slide-active .relative.z-10 {
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+
+        .swiper-pagination-bullet {
+            background: #d1d1d1 !important;
+            opacity: 1 !important;
+        }
+
+        .swiper-pagination-bullet-active {
+            background: #ff5528 !important;
+            width: 25px !important;
+            border-radius: 4px !important;
         }
     </style>
 

@@ -14,7 +14,7 @@ class EtkinlikController extends Controller
     {
         $sliders = Slider::active()->get();
 
-        $query = Etkinlik::approved()->with(['city', 'district']);
+        $query = Etkinlik::approved();
 
         // Filtreler
         if ($request->filled('search')) {
@@ -26,11 +26,11 @@ class EtkinlikController extends Controller
         }
 
         if ($request->filled('city')) {
-            $query->whereHas('city', fn($q) => $q->where('name', $request->city));
+            $query->where('city', $request->city);
         }
 
         if ($request->filled('district')) {
-            $query->whereHas('district', fn($q) => $q->where('name', $request->district));
+            $query->where('district', $request->district);
         }
 
         if ($request->filled('category')) {
@@ -57,8 +57,10 @@ class EtkinlikController extends Controller
 
     public function create()
     {
-        $cities = City::orderBy('name')->pluck('name', 'id');
-        return view('etkinlikler.create', compact('cities'));
+        $cities       = City::orderBy('name')->pluck('name', 'id');
+        $allDistricts = District::orderBy('name')->get();
+
+        return view('etkinlikler.create', compact('cities', 'allDistricts'));
     }
 
     public function store(Request $request)
@@ -66,6 +68,7 @@ class EtkinlikController extends Controller
         $validated = $request->validate([
             'title'       => 'required|string|max:255',
             'description' => 'nullable|string',
+            'content'     => 'nullable|string',
             'image'       => 'nullable|image|max:2048',
             'location'    => 'nullable|string|max:255',
             'category'    => 'nullable|string|max:100',
@@ -75,23 +78,73 @@ class EtkinlikController extends Controller
             'district_id' => 'nullable|exists:districts,id',
         ]);
 
+        $data = [
+            'title'       => $validated['title'],
+            'content'     => $validated['description'] ?? $validated['content'] ?? null,
+            'location'    => $validated['location'] ?? null,
+            'category'    => $validated['category'] ?? null,
+            'cost'        => $validated['cost'] ?? null,
+            'date'        => $validated['date'] ?? null,
+            'user_id'     => auth()->id(),
+            'source_type' => 'user',
+            'is_active'   => true,
+        ];
+
+        $isAdmin = auth()->user() && (auth()->user()->is_admin || auth()->user()->role === 'admin');
+        $data['status'] = $isAdmin ? 'approved' : 'pending';
+
         if ($request->hasFile('image')) {
-            $validated['image'] = $request->file('image')->store('etkinlikler', 'public');
+            $data['image'] = $request->file('image')->store('etkinlikler', 'public');
         }
 
-        $validated['user_id']     = auth()->id();
-        $validated['source_type'] = 'user';
-        $validated['status']      = 'pending';
+        if (!empty($validated['city_id'])) {
+            $city = City::find($validated['city_id']);
+            $data['city'] = $city ? $city->name : null;
+        }
 
-        Etkinlik::create($validated);
+        if (!empty($validated['district_id'])) {
+            $district = District::find($validated['district_id']);
+            $data['district'] = $district ? $district->name : null;
+        }
+
+        $etkinlik = Etkinlik::create($data);
+
+        if ($data['status'] === 'approved') {
+            return redirect()->route('etkinlikler.show', $etkinlik->slug)
+                ->with('success', 'Planınız başarıyla yayınlandı!');
+        }
 
         return redirect()->route('etkinlikler.index')
-            ->with('success', 'Etkinliğiniz incelemeye alındı.');
+            ->with('success', 'Harika! Etkinlik veya mekan öneriniz başarıyla oluşturuldu ve yönetici onayına gönderildi. Onaylandıktan sonra ana sayfada listelenecektir.');
     }
 
     public function show(string $slug)
     {
         $etkinlik = Etkinlik::where('slug', $slug)->firstOrFail();
-        return view('etkinlikler.show', compact('etkinlik'));
+        $etkinlik->increment('views');
+
+        $relatedEtkinlikler = Etkinlik::approved()
+            ->where('id', '!=', $etkinlik->id)
+            ->where(function ($q) use ($etkinlik) {
+                if ($etkinlik->category) {
+                    $q->where('category', $etkinlik->category);
+                }
+                if ($etkinlik->city) {
+                    $q->orWhere('city', $etkinlik->city);
+                }
+            })
+            ->latest()
+            ->take(3)
+            ->get();
+
+        if ($relatedEtkinlikler->isEmpty()) {
+            $relatedEtkinlikler = Etkinlik::approved()
+                ->where('id', '!=', $etkinlik->id)
+                ->latest()
+                ->take(3)
+                ->get();
+        }
+
+        return view('etkinlikler.show', compact('etkinlik', 'relatedEtkinlikler'));
     }
 }

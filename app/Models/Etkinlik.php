@@ -12,11 +12,11 @@ class Etkinlik extends Model
 
     protected $fillable = [
         'user_id',
-        'city_id',
-        'district_id',
+        'city',
+        'district',
         'title',
         'slug',
-        'description',
+        'content',
         'image',
         'location',
         'category',
@@ -24,10 +24,17 @@ class Etkinlik extends Model
         'date',
         'source_type',
         'status',
+        'is_active',
+        'views',
+        'capacity',
+        'rsvp_enabled',
+        'meta_title',
+        'meta_description',
     ];
 
     protected $casts = [
-        'date' => 'datetime',
+        'date'      => 'datetime',
+        'is_active' => 'boolean',
     ];
 
     protected static function boot(): void
@@ -41,19 +48,19 @@ class Etkinlik extends Model
         });
     }
 
+    public function getDescriptionAttribute()
+    {
+        return $this->content;
+    }
+
+    public function setDescriptionAttribute($value)
+    {
+        $this->attributes['content'] = $value;
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
-    }
-
-    public function city(): BelongsTo
-    {
-        return $this->belongsTo(City::class);
-    }
-
-    public function district(): BelongsTo
-    {
-        return $this->belongsTo(District::class);
     }
 
     public function scopeApproved($query)
